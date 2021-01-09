@@ -1,14 +1,23 @@
-import axios from 'axios'
-import React, { useState, useEffect } from 'react'
+//import axios from 'axios'
+import React, { useEffect } from 'react'
 import { Col, ListGroup, Row, Image, Card, Button } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 import Rating from '../components/Rating'
+import { listProductDetails } from '../actions/productActions'
+//import { productDetailsReducer } from '../reducers/productReducers'
+import Loader from '../components/Loader'
+import Message from '../components/Message'
 //import products from '../products'
 
 const ProductScreen = ({ match }) => {
-    const [product, setProduct] = useState({})
+    //const [product, setProduct] = useState({})
+    const dispatch = useDispatch()
 
-    useEffect(() => {
+    const productDetails = useSelector(state => state.productDetails)
+    const { loading, error, product } = productDetails
+
+    /* useEffect(() => {
         const fetchProduct = async () => {
             const { data } = await axios.get(`/api/products/${match.params.id}`)
 
@@ -16,7 +25,11 @@ const ProductScreen = ({ match }) => {
         }
 
         fetchProduct()
-    }, [match])
+    }, [match]) */
+
+    useEffect(() => {
+        dispatch(listProductDetails(match.params.id))
+    }, [dispatch, match])
 
     //const product = products.find((p) => p._id === match.params.id)
     return (
@@ -24,6 +37,11 @@ const ProductScreen = ({ match }) => {
             <Link className= 'btn btn-light my-3' to='/'>
                 Go Back
             </Link>
+            {loading ? (
+                <Loader />
+            ): error ? (
+                <Message variant='danger'>{error}</Message>
+            ) : (
             <Row>
                 <Col md={6}>
                     <Image src={product.image} alt={product.name} fluid/>
@@ -77,6 +95,7 @@ const ProductScreen = ({ match }) => {
                     </Card>
                 </Col>
             </Row>
+            )}
         </>
     )
 }
